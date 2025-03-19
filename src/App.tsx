@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Faculties from "./pages/Faculties";
+import Events from "./pages/Events";
+import Facilities from "./pages/Facilities";
+import Research from "./pages/Research";
+import FAQ from "./pages/FAQ";
+import { useState, useEffect } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem("isAuthenticated") === "true"
+  );
+
+  useEffect(() => {
+    const checkAuth = () => {
+      setIsAuthenticated(localStorage.getItem("isAuthenticated") === "true");
+    };
+
+    // Listen for changes to localStorage (important for logout)
+    window.addEventListener("storage", checkAuth);
+
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/" />} />
+      <Route path="/faculties" element={isAuthenticated ? <Faculties /> : <Navigate to="/" />} />
+      <Route path="/events" element={isAuthenticated ? <Events /> : <Navigate to="/" />} />
+      <Route path="/facilities" element={isAuthenticated ? <Facilities /> : <Navigate to="/" />} />
+      <Route path="/research" element={isAuthenticated ? <Research /> : <Navigate to="/" />} />
+      <Route path="/faq" element={isAuthenticated ? <FAQ /> : <Navigate to="/" />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
